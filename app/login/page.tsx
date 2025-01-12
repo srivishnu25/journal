@@ -1,10 +1,8 @@
 import JournalLogo from "@/app/ui/journal-logo";
-import LoginForm from "@/app/ui/login-form";
-import { providerMap, ProvidersIcon, signIn } from "@/auth";
+import { providerMap, ProviderNames, ProvidersIcon, signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { Button } from "../ui/button";
-import { ProviderName } from "../lib/definitions";
 import Link from "next/link";
 
 const SIGNIN_ERROR_URL = "/auth/error";
@@ -26,7 +24,7 @@ export default async function LoginPage(props: {
         <div className="grid grid-cols-1 gap-3">
           {Object.values(providerMap).map((provider) => {
             const Icon =
-              ProvidersIcon[provider.name.toLowerCase() as ProviderName];
+              ProvidersIcon[provider.name.toLowerCase() as ProviderNames];
             return (
               <form
                 key={provider.id}

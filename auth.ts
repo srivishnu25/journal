@@ -17,7 +17,9 @@ declare module "next-auth" {
 }
 
 const providers: Provider[] = [Google, GitHub];
-export const ProvidersIcon: Record<"google" | "github", () => JSX.Element> = {
+
+export type ProviderNames = "google" | "github";
+export const ProvidersIcon: Record<ProviderNames, () => JSX.Element> = {
   google: GoogleIcon,
   github: GithubIcon,
 };
