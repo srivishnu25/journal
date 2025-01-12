@@ -7,7 +7,10 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnJournal = nextUrl.pathname.startsWith("/journal");
+      const isOnJournal =
+        nextUrl.pathname.startsWith("/journal") ||
+        nextUrl.pathname.startsWith("/history");
+
       if (isOnJournal) {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page

@@ -1,48 +1,26 @@
+import { JSX } from "react";
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
-import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
-import { sql } from "@vercel/postgres";
-import type { User } from "@/app/lib/definitions";
-import bcrypt from "bcrypt";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import type { Provider } from "next-auth/providers";
+import { GithubIcon, GoogleIcon } from "./app/ui/icons";
+import { DefaultSession } from "next-auth";
+import prisma from "@/app/lib/prisma";
 
-async function getUser(email: string): Promise<User | undefined> {
-  try {
-    const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
-    return user.rows[0];
-  } catch (error) {
-    console.error("Failed to fetch user:", error);
-    throw new Error("Failed to fetch user.");
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+    } & DefaultSession["user"];
   }
 }
 
-const providers: Provider[] = [
-  // Credentials({
-  //   async authorize(credentials) {
-  //     const parsedCredentials = z
-  //       .object({
-  //         email: z.string().email(),
-  //         password: z.string().min(6),
-  //       })
-  //       .safeParse(credentials);
-  //     if (parsedCredentials.success) {
-  //       const { email, password } = parsedCredentials.data;
-  //       const user = await getUser(email);
-  //       if (!user) return null;
-  //       const passwordsMatch = await bcrypt.compare(password, user.password);
-
-  //       if (passwordsMatch) return user;
-  //     }
-
-  //     return null;
-  //   },
-  // }),
-  Google,
-  GitHub,
-];
+const providers: Provider[] = [Google, GitHub];
+export const ProvidersIcon: Record<"google" | "github", () => JSX.Element> = {
+  google: GoogleIcon,
+  github: GithubIcon,
+};
 
 export const providerMap = providers
   .map((provider) => {
@@ -50,35 +28,70 @@ export const providerMap = providers
       const providerData = provider();
       return { id: providerData.id, name: providerData.name };
     } else {
-      return { id: provider.id, name: provider.name };
+      return {
+        id: provider.id,
+        name: provider.name,
+      };
     }
   })
   .filter((provider) => provider.id !== "credentials");
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
-  // providers,
-  providers: [
-    Credentials({
-      async authorize(credentials) {
-        const parsedCredentials = z
-          .object({
-            email: z.string().email(),
-            password: z.string().min(6),
-          })
-          .safeParse(credentials);
-        if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data;
-          const user = await getUser(email);
-          if (!user) return null;
-          const passwordsMatch = await bcrypt.compare(password, user.password);
+  providers,
+  callbacks: {
+    ...authConfig.callbacks,
+    async signIn({ user, account }) {
+      if (!user.email) return false;
 
-          if (passwordsMatch) return user;
+      try {
+        // Check if user exists using Prisma
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+
+        if (!existingUser) {
+          // Create new user using Prisma
+          await prisma.user.create({
+            data: {
+              id: user.id,
+              name: user.name ?? "",
+              email: user.email,
+              image: user.image,
+            },
+          });
         }
 
-        return null;
-      },
-    }),
-    ...providers,
-  ],
+        return true;
+      } catch (error) {
+        console.error("Error handling sign in:", error);
+        return false;
+      }
+    },
+    async session({ session, user }) {
+      if (session.user) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: session.user.email },
+          select: { id: true },
+        });
+        session.user.id = dbUser?.id ?? "";
+      }
+      return session;
+    },
+  },
 });
+
+export async function getUserId(): Promise<string> {
+  const session = await auth();
+  if (!session?.user?.email) {
+    throw new Error("Not authenticated");
+  }
+
+  // Use Prisma to find the user by email
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user?.id) throw new Error("User not found");
+  return user?.id;
+}

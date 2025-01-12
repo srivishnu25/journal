@@ -1,138 +1,92 @@
 "use server";
 
-import { signIn } from "@/auth";
-import { sql } from "@vercel/postgres";
-import { AuthError } from "next-auth";
-import { revalidatePath } from "next/cache";
+import {
+  addJournalEntry,
+  deleteJournalEntry,
+  fetchUserJournalEntries,
+  updateJournalEntry,
+  getEntryById,
+  addAnalysis,
+  updateAnalysis,
+  getAnalysisById,
+} from "./data";
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import { getUserId } from "@/auth";
+import { revalidatePath } from "next/cache";
+import { analyze } from "./ai";
+import prisma from "@/app/lib/prisma";
 
-const FormSchema = z.object({
-  id: z.string(),
-  customerId: z.string({
-    invalid_type_error: "Please select a customer.",
-  }),
-  amount: z.coerce
-    .number()
-    .gt(0, { message: "Please enter an amount greater than $0" }),
-  status: z.enum(["pending", "paid"], {
-    invalid_type_error: "Please select an invoice status",
-  }),
-  date: z.string(),
-});
+export async function createNewEntry() {
+  const userId = await getUserId();
 
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
-export type State = {
-  errors?: {
-    customerId?: string[];
-    amount?: string[];
-    status?: string[];
-  };
-  message?: string | null;
-};
-export async function createInvoice(prevState: State, formData: FormData) {
-  const validatedFields = CreateInvoice.safeParse({
-    customerId: formData.get("customerId"),
-    amount: formData.get("amount"),
-    status: formData.get("status"),
-  });
-
-  // If form validation fails, return errors early. Otherwise, continue.
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: "Missing Fields. Failed to Create Invoice.",
-    };
-  }
-
-  // Prepare data for insertion into the database
-  const { customerId, amount, status } = validatedFields.data;
-  const amountInCents = amount * 100;
-  const date = new Date().toISOString().split("T")[0];
-
-  // Insert data into the database
-  try {
-    await sql`
-      INSERT INTO invoices (customer_id, amount, status, date)
-      VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
-    `;
-  } catch (error) {
-    // If a database error occurs, return a more specific error.
-    return {
-      message: "Database Error: Failed to Create Invoice.",
-    };
-  }
-
-  // Revalidate the cache for the invoices page and redirect the user.
-  revalidatePath("/dashboard/invoices");
-  redirect("/dashboard/invoices");
+  const entry = await addJournalEntry(userId, "Write about your day!");
+  const analysis = await analyze(entry.content);
+  await addAnalysis({ entryId: entry.id, userId, ...analysis });
+  revalidatePath("/journal");
+  redirect(`/journal/${entry.id}`);
 }
 
-// Use Zod to update the expected types
-const UpdateInvoice = FormSchema.omit({ id: true, date: true });
+export async function getEntries() {
+  const userId = await getUserId();
+  return await fetchUserJournalEntries(userId);
+}
 
-// ...
+export async function deleteEntry(entryId: string) {
+  await deleteJournalEntry(entryId);
+  revalidatePath("/journal");
+}
 
-export async function updateInvoice(
-  id: string,
-  prevState: State,
-  formData: FormData
+export async function updateEntry(entryId: string, content: string) {
+  const updatedEntry = await updateJournalEntry(entryId, content);
+  if (!updatedEntry) return null;
+  const analysis = await analyze(updatedEntry?.content ?? "");
+  await updateAnalysis({ entryId, userId: updatedEntry.userId, ...analysis });
+  revalidatePath(`/journal/${updatedEntry.id}`);
+  return updatedEntry;
+}
+
+export async function getEntry(entryId: string) {
+  const entry = await getEntryById(entryId);
+  return entry;
+}
+
+export async function getAnalysis(entryId: string) {
+  return await getAnalysisById(entryId);
+}
+
+export async function updateEntryOptimized(
+  entryId: string,
+  userId: string,
+  content: string
 ) {
-  const validatedFields = UpdateInvoice.safeParse({
-    customerId: formData.get("customerId"),
-    amount: formData.get("amount"),
-    status: formData.get("status"),
-  });
+  // Run the journal update and AI analysis concurrently
+  const analysisPromise = analyze(content);
 
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: "Missing Fields. Failed to Update Invoice.",
-    };
+  const analysis = await analysisPromise;
+
+  if (analysis) {
+    // Use a Prisma transaction to batch the database updates
+    const transactionResult = await prisma.$transaction([
+      // Update the journal entry content
+      prisma.journalEntry.update({
+        where: { id: entryId },
+        data: { content },
+      }),
+
+      // Upsert the analysis data
+      prisma.analysis.upsert({
+        where: { entryId },
+        create: { entryId, userId, ...analysis },
+        update: { ...analysis },
+      }),
+    ]);
+
+    // Revalidate path after transaction
+    revalidatePath(`/journal/${entryId}`);
+
+    // Return the updated journal entry
+    return transactionResult[0]; // The first element in the transaction corresponds to the journal update result
   }
 
-  const { customerId, amount, status } = validatedFields.data;
-  const amountInCents = amount * 100;
-
-  try {
-    await sql`
-      UPDATE invoices
-      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-      WHERE id = ${id}
-    `;
-  } catch (error) {
-    return { message: "Database Error: Failed to Update Invoice." };
-  }
-
-  revalidatePath("/dashboard/invoices");
-  redirect("/dashboard/invoices");
-}
-
-export async function deleteInvoice(id: string) {
-  try {
-    await sql`DELETE FROM invoices WHERE id = ${id}`;
-    revalidatePath("/dashboard/invoices");
-    return { message: "Deleted Invoice." };
-  } catch (error) {
-    return { message: "Database Error: Failed to Delete Invoice." };
-  }
-}
-
-export async function authenticate(
-  prevState: string | undefined,
-  formData: FormData
-) {
-  try {
-    await signIn("credentials", formData);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return "Invalid credentials.";
-        default:
-          return "Something went wrong.";
-      }
-    }
-    throw error;
-  }
+  return null; // Handle cases where analysis fails
 }
