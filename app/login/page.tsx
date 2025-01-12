@@ -20,7 +20,6 @@ export default async function LoginPage(props: {
             <JournalLogo />
           </Link>
         </div>
-        {/* <LoginForm key={"creds-form"} /> */}
         <div className="grid grid-cols-1 gap-3">
           {Object.values(providerMap).map((provider) => {
             const Icon =
