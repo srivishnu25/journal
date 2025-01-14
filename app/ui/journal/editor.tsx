@@ -1,6 +1,6 @@
 "use client";
 
-import { updateEntry, updateEntryOptimized } from "@/app/lib/actions";
+import { updateEntryOptimized } from "@/app/lib/actions";
 import { JournalEntry } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
@@ -13,13 +13,20 @@ export default function Editor({
   // Local state to manage the content for instant UI updates
   const [content, setContent] = useState(initialContent);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const isRequestPending = useRef(false);
 
   // Debounced function to update the server
   const handleEntryUpdate = useDebouncedCallback(async (content: string) => {
+    // Prevent overlapping requests
+    if (isRequestPending.current) return;
+
+    isRequestPending.current = true;
     try {
       await updateEntryOptimized(id, userId, content);
     } catch (error) {
       console.error("Failed to update entry:", error);
+    } finally {
+      isRequestPending.current = false;
     }
   }, 500);
 
