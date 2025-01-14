@@ -32,8 +32,11 @@ export async function getEntries() {
   return await fetchUserJournalEntries(userId);
 }
 
-export async function getAnalyses(userId: string) {
-  return await getAnalysesByUserId(userId);
+export async function getAnalyses(
+  userId: string,
+  order: "desc" | "asc" = "desc"
+) {
+  return await getAnalysesByUserId(userId, order);
 }
 
 export async function deleteEntry(entryId: string) {

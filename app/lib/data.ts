@@ -176,11 +176,14 @@ export async function getAnalysisById(
 }
 
 // Fetch all analyses for a specific user
-export async function getAnalysesByUserId(userId: string): Promise<Analysis[]> {
+export async function getAnalysesByUserId(
+  userId: string,
+  order: "desc" | "asc"
+): Promise<Analysis[]> {
   try {
     const analyses = await prisma.analysis.findMany({
       where: { userId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: order },
     });
     return analyses;
   } catch (error) {
