@@ -1,8 +1,10 @@
-import { getEntries } from "@/app/lib/actions";
+import { getAnalyses } from "@/app/lib/actions";
 import { EntryCard } from "./entry-card";
 
 export default async function EntryCards() {
-  const entries = await getEntries();
+  const analyses = await getAnalyses();
 
-  return entries?.map((entry) => <EntryCard key={entry.id} {...entry} />);
+  return analyses?.map((analysis) => (
+    <EntryCard key={analysis.entryId} {...analysis} />
+  ));
 }

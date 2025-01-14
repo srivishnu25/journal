@@ -9,6 +9,7 @@ import {
   addAnalysis,
   updateAnalysis,
   getAnalysisById,
+  getAnalysesByUserId,
 } from "./data";
 import { redirect } from "next/navigation";
 import { getUserId } from "@/auth";
@@ -29,6 +30,11 @@ export async function createNewEntry() {
 export async function getEntries() {
   const userId = await getUserId();
   return await fetchUserJournalEntries(userId);
+}
+
+export async function getAnalyses() {
+  const userId = await getUserId();
+  return await getAnalysesByUserId(userId);
 }
 
 export async function deleteEntry(entryId: string) {

@@ -24,6 +24,9 @@ export function SkeletonCards() {
       <SkeletonCard />
       <SkeletonCard />
       <SkeletonCard />
+      <SkeletonCard />
+      <SkeletonCard />
+      <SkeletonCard />
     </>
   );
 }

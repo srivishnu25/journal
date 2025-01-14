@@ -1,7 +1,6 @@
 import { getEntryById } from "@/app/lib/data";
 import AnalysisBar from "@/app/ui/journal/analysis-bar";
 import Editor from "@/app/ui/journal/editor";
-import { getUserId } from "@/auth";
 import { redirect } from "next/navigation";
 
 export default async function Page({

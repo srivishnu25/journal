@@ -173,3 +173,17 @@ export async function getAnalysisById(
     throw new Error("Failed to fetch analysis by entry ID.");
   }
 }
+
+// Fetch all analyses for a specific user
+export async function getAnalysesByUserId(userId: string): Promise<Analysis[]> {
+  try {
+    const analyses = await prisma.analysis.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+    return analyses;
+  } catch (error) {
+    console.error("Error fetching analyses by user ID:", error);
+    throw new Error("Failed to fetch analyses by user ID.");
+  }
+}
