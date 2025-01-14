@@ -18,3 +18,12 @@ export const formatDateToLocal = (
   const formatter = new Intl.DateTimeFormat(locale, options);
   return formatter.format(date);
 };
+
+export const INITIAL_ANALYSIS = {
+  mood: "reflective",
+  subject: "daily life",
+  negative: false,
+  summary: "Wrote a journal entry about my day",
+  color: "#87ceeb",
+  sentimentScore: 5,
+};

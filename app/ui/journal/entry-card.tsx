@@ -2,7 +2,7 @@
 import { deleteEntry } from "@/app/lib/actions";
 import { formatDateToLocal } from "@/app/lib/utils";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Analysis, JournalEntry } from "@prisma/client";
+import { Analysis } from "@prisma/client";
 import { useRouter } from "next/navigation";
 
 export function EntryCard(analysis: Analysis) {
@@ -23,7 +23,8 @@ export function EntryCard(analysis: Analysis) {
       </div>
 
       <div className="text-base">
-        Mood:&nbsp;<span className="uppercase italic"> {analysis.mood}</span>
+        Mood:&nbsp;
+        <span className="uppercase tracking-wider"> {analysis.mood}</span>
       </div>
       <div className="text-sm text-white/60">{formattedDate}</div>
       <span
@@ -31,7 +32,7 @@ export function EntryCard(analysis: Analysis) {
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
-          await deleteEntry(analysis.id);
+          await deleteEntry(analysis.entryId);
         }}
       >
         <XMarkIcon width={20} height={20} />

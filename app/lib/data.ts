@@ -62,9 +62,10 @@ export async function deleteJournalEntry(
     await prisma.journalEntry.delete({
       where: { id: entryId },
     });
+    console.log("called");
     return { message: "Deleted Journal entry" };
   } catch (error) {
-    console.error("Error deleting journal entry:", error);
+    // console.error("Error deleting journal entry:", error);
     return {
       message: "Error deleting journal entry:",
     };

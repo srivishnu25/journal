@@ -14,15 +14,15 @@ import {
 import { redirect } from "next/navigation";
 import { getUserId } from "@/auth";
 import { revalidatePath } from "next/cache";
-import { analyze } from "./ai";
+import { analyze } from "@/app/lib/ai";
 import prisma from "@/app/lib/prisma";
+import { INITIAL_ANALYSIS } from "@/app/lib/utils";
 
-export async function createNewEntry() {
-  const userId = await getUserId();
-
+export async function createNewEntry(userId: string) {
   const entry = await addJournalEntry(userId, "Write about your day!");
-  const analysis = await analyze(entry.content);
-  await addAnalysis({ entryId: entry.id, userId, ...analysis });
+  // const analysis = await analyze(entry.content);
+  // console.log("analysis", analysis);
+  await addAnalysis({ entryId: entry.id, userId, ...INITIAL_ANALYSIS });
   revalidatePath("/journal");
   redirect(`/journal/${entry.id}`);
 }
@@ -32,8 +32,7 @@ export async function getEntries() {
   return await fetchUserJournalEntries(userId);
 }
 
-export async function getAnalyses() {
-  const userId = await getUserId();
+export async function getAnalyses(userId: string) {
   return await getAnalysesByUserId(userId);
 }
 
