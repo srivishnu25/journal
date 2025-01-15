@@ -14,8 +14,10 @@ export default async function Page() {
   const { analyses, avg } = await getData();
   return (
     <div className="w-full h-full">
-      <div className="text-2xl font-bold">Avg. Sentiment {avg}</div>
-      <div className="w-full h-full">
+      <div className="px-8 py-2 md:text-2xl font-medium">
+        Avg. Sentiment: {avg}
+      </div>
+      <div className="w-full h-[calc(100%-40px)] md:h-full">
         <HistoryChart data={analyses} />
       </div>
     </div>

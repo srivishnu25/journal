@@ -23,13 +23,13 @@ export default function NavLinks() {
             key={link.name}
             href={link.href}
             className={clsx(
-              "h-[48px] grow flex items-center rounded-md p-3 font-medium hover:text-blue-600 hover:bg-blue-600/10 md:flex-none md:justify-start md:p-2 md:px-3",
+              "h-[48px] grow flex items-center justify-center rounded-md p-3 font-medium hover:text-blue-600 hover:bg-blue-600/10 md:flex-none md:justify-start md:p-2 md:px-3",
               {
                 "text-blue-600": pathname === link.href,
               }
             )}
           >
-            <p className="hidden md:block">{link.name}</p>
+            <p>{link.name}</p>
           </Link>
         );
       })}

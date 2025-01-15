@@ -12,7 +12,9 @@ export default async function Layout({
         <SideNav />
       </div>
       <Header />
-      <div className="w-full flex-grow pt-16 relative">{children}</div>
+      <div className="w-full flex-grow md:pt-16 relative overflow-y-auto">
+        {children}
+      </div>
     </div>
   );
 }

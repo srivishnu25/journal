@@ -6,9 +6,9 @@ import JournalLogo from "../journal-logo";
 
 export default function SideNav() {
   return (
-    <div className="flex h-full flex-col px-3 py-4 md:px-2 border-r border-stone-600">
+    <div className="flex h-full flex-col px-6 pt-[72px] md:py-3 md:px-2 md:border-r md:border-stone-600">
       <Link
-        className="mb-2 flex h-16 items-center justify-start rounded-md"
+        className="hidden md:flex mb-2 h-16 items-center justify-start rounded-md"
         href="/"
       >
         <div className="w-32 md:w-40">

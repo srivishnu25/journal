@@ -14,7 +14,7 @@ export default async function Page({
 
   return (
     <>
-      <div className="px-8 py-8 h-full w-[calc(100%-280px)]">
+      <div className="px-8 py-8 h-full w-full md:w-[calc(100%-280px)]">
         <Editor {...entry} />
       </div>
       <AnalysisBar entryId={entry.id} />

@@ -8,7 +8,7 @@ export default async function Page() {
   const userId = await getUserId();
   return (
     <div className="p-8">
-      <div className="grid grid-cols-[repeat(2,minmax(0,240px))] md:grid-cols-[repeat(4,minmax(0,240px))] gap-10">
+      <div className="flex basis-56 md:basis-[240px] justify-center md:justify-start flex-wrap gap-8 md:gap-10">
         <NewEntryCard userId={userId} />
         <Suspense fallback={<SkeletonCards />}>
           <EntryCards userId={userId} />

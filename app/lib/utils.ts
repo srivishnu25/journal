@@ -1,3 +1,6 @@
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString("en-US", {
     style: "currency",
@@ -27,3 +30,7 @@ export const INITIAL_ANALYSIS = {
   color: "#87ceeb",
   sentimentScore: 5,
 };
+
+export function cn(...inputs: (string | undefined)[]) {
+  return twMerge(clsx(inputs));
+}

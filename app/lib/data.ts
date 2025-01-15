@@ -12,7 +12,7 @@ export async function fetchUserJournalEntries(
     });
     return entries;
   } catch (error) {
-    console.error("Error fetching journal entries:", error);
+    // console.error("Error fetching journal entries:", error);
     throw new Error("Failed to fetch journal entries.");
   }
 }
@@ -31,7 +31,7 @@ export async function addJournalEntry(
     });
     return entry;
   } catch (error) {
-    console.error("Error adding journal entry:", error);
+    // console.error("Error adding journal entry:", error);
     throw new Error("Failed to add journal entry.");
   }
 }
@@ -49,7 +49,7 @@ export async function updateJournalEntry(
     });
     return entry;
   } catch (error) {
-    console.error("Error updating journal entry:", error);
+    // console.error("Error updating journal entry:", error);
     throw new Error("Failed to update journal entry.");
   }
 }
@@ -80,7 +80,7 @@ export async function getUserById(id: string): Promise<User | null> {
     });
     return user;
   } catch (error) {
-    console.error("Error fetching user by ID:", error);
+    // console.error("Error fetching user by ID:", error);
     throw new Error("Failed to fetch user by ID.");
   }
 }
@@ -92,7 +92,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     });
     return user;
   } catch (error) {
-    console.error("Error fetching user by email:", error);
+    // console.error("Error fetching user by email:", error);
     throw new Error("Failed to fetch user by email.");
   }
 }
@@ -107,7 +107,7 @@ export async function getEntryById(
     });
     return entry;
   } catch (error) {
-    console.error("Error fetching journal entry by ID:", error);
+    // console.error("Error fetching journal entry by ID:", error);
     throw new Error("Failed to fetch journal entry by ID.");
   }
 }
@@ -134,7 +134,7 @@ export async function updateAnalysis({
     });
     return analysis;
   } catch (error) {
-    console.error("Error upserting analysis entry:", error);
+    // console.error("Error upserting analysis entry:", error);
     throw new Error("Failed to upsert analysis entry.");
   }
 }
@@ -155,7 +155,7 @@ export async function addAnalysis({
     });
     return analysis;
   } catch (error) {
-    console.error("Error adding analysis entry:", error);
+    // console.error("Error adding analysis entry:", error);
     throw new Error("Failed to add analysis entry.");
   }
 }
@@ -170,7 +170,7 @@ export async function getAnalysisById(
     });
     return analysis;
   } catch (error) {
-    console.error("Error fetching analysis by entry ID:", error);
+    // console.error("Error fetching analysis by entry ID:", error);
     throw new Error("Failed to fetch analysis by entry ID.");
   }
 }
@@ -187,7 +187,7 @@ export async function getAnalysesByUserId(
     });
     return analyses;
   } catch (error) {
-    console.error("Error fetching analyses by user ID:", error);
+    // console.error("Error fetching analyses by user ID:", error);
     throw new Error("Failed to fetch analyses by user ID.");
   }
 }

@@ -13,7 +13,7 @@ export default async function LoginPage(props: {
   const searchParams = await props.searchParams;
   const callbackUrl = searchParams?.callbackUrl || "/journal";
   return (
-    <main className="flex items-center justify-center md:h-screen">
+    <main className="flex items-center justify-center h-screen">
       <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
         <div className="flex h-20 w-full items-center justify-center rounded-lg p-3 md:h-36">
           <Link href="/" className="text-white w-48">
