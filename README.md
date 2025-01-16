@@ -16,13 +16,13 @@ Here are some previews of the Journal App:
 
 ### Home Page
 
-![Home Page](public/dashboard-overview.png)
-![Home Page Mobile](public/dashboard-overview-mobile.png)
+<img src="public/dashboard-overview.png" alt="Home Page" width="600" height="400" />
+<img src="public/dashboard-overview-mobile.png" alt="Home Page Mobile" width="300" height="600" />
 
 ### Journal Page
 
-![Journal Page](public/journal-overview.png)
-![Journal Page Mobile](public/journal-overview-mobile.png)
+<img src="public/journal-overview.png" alt="Journal Page" width="600" height="400" />
+<img src="public/journal-overview-mobile.png" alt="Journal Page Mobile" width="300" height="600" />
 
 ## Getting Started
 
