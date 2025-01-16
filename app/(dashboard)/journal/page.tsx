@@ -2,8 +2,12 @@ import EntryCards from "@/app/ui/journal/entry-cards";
 import NewEntryCard from "@/app/ui/journal/new-entry-card";
 import { SkeletonCards } from "@/app/ui/skeletons";
 import { getUserId } from "@/auth";
+import { Metadata } from "next";
 import { Suspense } from "react";
 
+export const metadata: Metadata = {
+  title: "Journal",
+};
 export default async function Page() {
   const userId = await getUserId();
   return (

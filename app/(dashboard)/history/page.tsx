@@ -1,6 +1,11 @@
 import { getAnalyses } from "@/app/lib/actions";
 import HistoryChart from "@/app/ui/history/history-card";
 import { getUserId } from "@/auth";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "History",
+};
 
 const getData = async () => {
   const userId = await getUserId();
@@ -17,7 +22,7 @@ export default async function Page() {
       <div className="px-8 py-2 md:text-2xl font-medium">
         Avg. Sentiment: {avg}
       </div>
-      <div className="w-full h-[calc(100%-40px)] md:h-full">
+      <div className="w-full h-[calc(100%-48px)]">
         <HistoryChart data={analyses} />
       </div>
     </div>

@@ -17,12 +17,18 @@ import { inter } from "@/app/ui/fonts";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Journal",
-    default: "Journal",
+    template: "%s | Journal App",
+    default: "Journal App",
   },
   description:
     "An AI-powered journaling app that helps you track your thoughts, analyze moods, and gain insights for better mental well-being.",
   metadataBase: new URL("https://journal-tau-kohl.vercel.app"),
+  keywords: [
+    "AI-powered",
+    "Track your mood",
+    "Emotional journey",
+    "Self-awarness",
+  ],
 };
 
 export default function RootLayout({
